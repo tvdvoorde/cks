@@ -391,6 +391,10 @@ iptables -t nat -L KUBE-SERVICES
 
 <https://acloud.guru/learn/7d2c29e7-cdb2-4f44-8744-06332f47040e>
 
+<https://github.com/cloudnative-id/certified-kubernetes-security>
+
+<https://ravikirans.com/cks-kubernetes-security-exam-study-guide/>
+
 ## Exam requirements
 
 Allow in tabs
