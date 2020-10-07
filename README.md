@@ -12,6 +12,103 @@ Build a v1.19 'kubeadm' cluster on Ubuntu 18 with a dedicated master and worker 
 kubectl explain NetworkPolicy.spec
 ```
 
+NetworkPolicy's are applied to a namespace. The spec.podSelector defines criteria for the namespace.
+
+Default deny all ingress
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+```
+
+Default allow all ingress
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-ingress
+spec:
+  podSelector: {}
+  ingress:
+  - {}
+  policyTypes:
+  - Ingress
+```
+
+Default deny all egress
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-egress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+```
+
+Default allow all egress
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-egress
+spec:
+  podSelector: {}
+  egress:
+  - {}
+  policyTypes:
+  - Egress
+```
+
+Deny all ingress & egress
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+```
+
+Real world example
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-microservice-to-microservice
+spec:
+  podSelector:
+    matchLabels: 
+      application: one4all
+  policyTypes:
+  - Ingress
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            application: one4all
+      ports:
+      - protocol: TCP
+        port: 6000
+      - protocol: TCP
+        port: 5000
+```
+
 <https://kubernetes.io/docs/concepts/services-networking/network-policies/>
 
 <https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/>
