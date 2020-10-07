@@ -125,16 +125,23 @@ spec:
 
 ## System Hardening – 15%
 
-### Minimize host OS footprint (reduce attack surface)
+<details><summary>Minimize host OS footprint (reduce attack surface)</summary>
 
-### Minimize IAM roles
+</details>
 
-### Minimize external access to the network
+<details><summary>Minimize IAM roles</summary>
+
+</details>
+
+<details><summary>Minimize external access to the network</summary>
 
 - set loadbalancer to ClusterIP
 - network policies
 
-### Appropriately use kernel hardening tools such as AppArmor, seccomp
+</details>
+
+
+<details><summary>Appropriately use kernel hardening tools such as AppArmor, seccomp</summary>
 
 <https://kubernetes.io/docs/tutorials/clusters/apparmor/>
 <https://kubernetes.io/docs/tutorials/clusters/seccomp/>
@@ -178,9 +185,11 @@ audit.json
 
 trigger the pod (curl ip:5678) and check the logs `tail -f /var/log/syslog | grep 'http-echo'`
 
+</details>
+
 ## Minimize Microservice Vulnerabilities – 20%
 
-### Setup appropriate OS level security domains e.g. using PSP, OPA, security contexts
+<details><summary>Setup appropriate OS level security domains e.g. using PSP, OPA, security contexts</summary>
 
 POD SECURITY POLICY
 
@@ -241,8 +250,9 @@ spec:
     securityContext:
       allowPrivilegeEscalation: false
 ```
+</details>
 
-### Manage Kubernetes secrets
+<details><summary>Manage Kubernetes secrets</summary>
 
 <https://kubernetes.io/docs/concepts/configuration/secret/>
 
@@ -261,13 +271,19 @@ KEY2=VALUE2
 
 `kubectl create secret tls tls-secret --cert=path/to/tls.cert --key=path/to/tls.key`
 
-### Use container runtime sandboxes in multi-tenant environments (e.g. gvisor, kata containers)
+</details>
 
-### Implement pod to pod encryption by use of mTLS
+<details><summary>Use container runtime sandboxes in multi-tenant environments (e.g. gvisor, kata containers)</summary>
+</details>
+
+<details><summary>Implement pod to pod encryption by use of mTLS</summary>
+
+</details>
 
 ## Supply Chain Security – 20%
 
-### Minimize base image footprint
+<details><summary>Minimize base image footprint</summary>
+
 
 <https://kubernetes.io/docs/concepts/workloads/pods/ephemeral-containers/>
 
@@ -277,26 +293,25 @@ KEY2=VALUE2
     gcr.io/distroless/java-debian10
     gcr.io/distroless/cc-debian10
 ```
+</details>
 
-### Secure your supply chain: whitelist allowed registries, sign and validate images
+<details><summary>Secure your supply chain: whitelist allowed registries, sign and validate images</summary></details>
 
+<details><summary>Use static analysis of user workloads (e.g.Kubernetes resources, Docker files)</summary></details>
 
-
-### Use static analysis of user workloads (e.g.Kubernetes resources, Docker files)
-
-### Scan images for known vulnerabilities
+<details><summary>Scan images for known vulnerabilities</summary></details>
 
 ## Monitoring, Logging and Runtime Security – 20%
 
-### Perform behavioral analytics of syscall process and file activities at the host and container level to detect malicious activities
+<details><summary>Perform behavioral analytics of syscall process and file activities at the host and container level to detect malicious activities</summary></details>
 
-### Detect threats within physical infrastructure, apps, networks, data, users and workloads
+<details><summary>Detect threats within physical infrastructure, apps, networks, data, users and workloads</summary></details>
 
-### Detect all phases of attack regardless where it occurs and how it spreads
+<details><summary>Detect all phases of attack regardless where it occurs and how it spreads</summary></details>
 
-### Perform deep analytical investigation and identification of bad actors within environment
+<details><summary>Perform deep analytical investigation and identification of bad actors within environment</summary></details>
 
-### Ensure immutability of containers at runtime
+<details><summary>Ensure immutability of containers at runtime</summary>
 
 ```
 apiVersion: apps/v1
@@ -328,8 +343,9 @@ spec:
       - emptyDir: {}
         name: tmp
 ```
+</details>
 
-### Use Audit Logs to monitor access
+<details><summary>Use Audit Logs to monitor access</summary></details>
 
 ## Command reference 1.19
 
@@ -390,7 +406,7 @@ kubectl top
 iptables -t nat -L KUBE-SERVICES
 ```
 
-## references
+## Referenced sites
 
 <https://github.com/David-VTUK/CKA-StudyGuide/blob/master/RevisionTopics/Part-5-Security.md>
 
@@ -398,7 +414,7 @@ iptables -t nat -L KUBE-SERVICES
 
 <https://cloud.google.com/blog/products/gcp/7-best-practices-for-building-containers>
 
-## CKS prep sites
+## other CKS preparation sites
 
 <https://blog.nativecloud.dev/how-to-prepare-for-the-upcoming-cks-certification/>
 
@@ -412,9 +428,9 @@ iptables -t nat -L KUBE-SERVICES
 
 <https://ravikirans.com/cks-kubernetes-security-exam-study-guide/>
 
-## Exam requirements
+## Exam details
 
-Allow in tabs
+URLs allowed in browser (only one tab)
 
 <https://kubernetes.io/docs/>
 
@@ -436,6 +452,4 @@ Allow in tabs
 - In addition, you might find it helpful to use the Notepad (see top menu under 'Exam Controls') to manipulate text before pasting to the command line.
 - Installation of services and applications included in this exam may require modification of system security policies to successfully complete.
 - Only a single terminal console is available during the exam. Terminal multiplexers such as GNU Screen and tmux can be used to create virtual consoles.
-
-
 
