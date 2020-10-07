@@ -377,9 +377,19 @@ iptables -t nat -L KUBE-SERVICES
 
 <https://github.com/David-VTUK/CKA-StudyGuide/blob/master/RevisionTopics/Part-5-Security.md>
 
-<https://blog.nativecloud.dev/how-to-prepare-for-the-upcoming-cks-certification/>
-
 <https://blog.heptio.com/on-securing-the-kubernetes-dashboard-16b09b1b7aca>
 
 <https://cloud.google.com/blog/products/gcp/7-best-practices-for-building-containers>
+
+## CKS prep sites
+
+<https://blog.nativecloud.dev/how-to-prepare-for-the-upcoming-cks-certification/>
+
+<https://github.com/walidshaari/Certified-Kubernetes-Security-Specialist>
+
+<https://github.com/ijelliti/CKSS-Certified-Kubernetes-Security-Specialist>
+
+<https://acloud.guru/learn/7d2c29e7-cdb2-4f44-8744-06332f47040e>
+
+
 
