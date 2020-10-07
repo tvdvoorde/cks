@@ -391,5 +391,28 @@ iptables -t nat -L KUBE-SERVICES
 
 <https://acloud.guru/learn/7d2c29e7-cdb2-4f44-8744-06332f47040e>
 
+## Exam requirements
+
+Allow in tabs
+
+<https://kubernetes.io/docs/>
+<https://github.com/kubernetes/>
+<https://kubernetes.io/blog/>
+
+- Root privileges can be obtained by running 'sudo −i'.
+- Rebooting of your server IS permitted at any time.
+- Do not stop or tamper with the certerminal process as this will END YOUR EXAM SESSION.
+- Do not block incoming ports 8080/tcp, 4505/tcp and 4506/tcp. This includes firewall rules that are found within the distribution's default firewall configuration files as well as interactive firewall commands.
+- Use Ctrl+Alt+W instead of Ctrl+W.
+- Ctrl+W is a keyboard shortcut that will close the current tab in Google Chrome.
+- Ctrl+C & and Ctrl+V are not supported in your exam terminal.
+- To copy and paste text, please use;
+- For Linux: select text for copy and middle button for paste (or both left and right simultaneously if you have no middle button).
+- For Mac: ⌘+C to copy and ⌘+V to paste.
+- For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
+- In addition, you might find it helpful to use the Notepad (see top menu under 'Exam Controls') to manipulate text before pasting to the command line.
+- Installation of services and applications included in this exam may require modification of system security policies to successfully complete.
+- Only a single terminal console is available during the exam. Terminal multiplexers such as GNU Screen and tmux can be used to create virtual consoles.
+
 
 
