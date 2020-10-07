@@ -1,18 +1,41 @@
 # CKS
 
-## Cluster Setup – 10%
+## Preparations
 
+Build a v1.19 'kubeadm' cluster on Ubuntu 18 with a dedicated master and worker node 
+
+## Cluster Setup – 10%
 
 <details><summary>Use Network security policies to restrict cluster level access</summary>
 
 ```bash
 kubectl explain NetworkPolicy.spec
 ```
+
+<https://kubernetes.io/docs/concepts/services-networking/network-policies/>
+
+<https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/>
+
+<https://kubernetes.io/docs/tasks/administer-cluster/declare-network-policy/>
+
+<https://kubernetes.io/blog/2017/10/enforcing-network-policies-in-kubernetes/>
+
+<https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/>
+
 </details>
 
 <details><summary>Use CIS benchmark to review the security configuration of Kubernetes components (etcd, kubelet, kubedns, kubeapi)</summary>
 
-???
+<https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks>
+
+<https://www.cisecurity.org/benchmark/kubernetes/>
+
+<https://docs.microsoft.com/en-us/microsoft-365/compliance/offering-cis-benchmark>
+
+<https://github.com/aquasecurity/kube-bench#running-kube-bench>
+
+<https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks#default-values>
+
 </details>
 
 <details><summary>Properly set up Ingress objects with security control</summary>
@@ -44,17 +67,38 @@ spec:
           servicePort: 80
 ```
 
+<https://kubernetes.io/docs/concepts/services-networking/ingress/>
+
+<https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/>
+
+<https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/>
+
+<https://kubernetes.io/docs/concepts/services-networking/ingress/#tls>
+
+
 </details>
 
 <details><summary>Protect node metadata and endpoints</summary>
 
 <https://kubernetes.io/blog/2016/03/how-container-metadata-changes-your-point-of-view/>
 
+<https://blog.cloud66.com/setting-up-secure-endpoints-in-kubernetes/>
+
+<https://cloud.google.com/kubernetes-engine/docs/how-to/protecting-cluster-metadata>
+
+<https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#restricting-cloud-metadata-api-access>
+
+<https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html>
+
+<https://docs.aws.amazon.com/eks/latest/userguide/restrict-ec2-credential-access.html>
+
 </details>
 
 <details><summary>Minimize use of, and access to, GUI elements</summary>
 
 <https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>
+
+<https://blog.heptio.com/on-securing-the-kubernetes-dashboard-16b09b1b7aca>
 
 </details>
 
@@ -65,6 +109,8 @@ echo -n "bla" | sha256sum
 cat <binary> | sha256sum
 cat <binary> | sha512sum
 ```
+
+<https://github.com/kubernetes/kubernetes/releases>
 
 <https://kubernetes.io/docs/setup/release/notes/#client-binaries>
 
@@ -82,19 +128,39 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/l
 
 <https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/>
 
+<https://kubernetes.io/docs/reference/access-authn-authz/controlling-access/>
+
+<https://cloud.google.com/anthos/gke/docs/on-prem/how-to/hardening-your-cluster>
+
 </details>
 
 <details><summary>Use Role Based Access Controls to minimize exposure</summary>
 
 <https://kubernetes.io/docs/reference/access-authn-authz/rbac/>
 
+<https://kubernetes.io/docs/reference/access-authn-authz/authorization/#authorization-modules>
+
+<https://www.youtube.com/watch?v=G3R24JSlGjY>
+
+<https://rbac.dev/>
+
 </details>
 
 <details><summary>Exercise caution in using service accounts e.g. disable defaults, minimize permissions on newly created ones</summary>
 
-<https://kubernetes.io/docs/tasks/tools/install-kubectl/>
+<https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/>
 
 <https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/>
+
+<https://docs.armory.io/docs/armory-admin/manual-service-account/>
+
+<https://stackoverflow.com/questions/52583497/how-to-disable-the-use-of-a-default-service-account-by-a-statefulset-deployments>
+
+<https://thenewstack.io/kubernetes-access-control-exploring-service-accounts/>
+
+<https://github.com/kubernetes/kubernetes/issues/57601>
+
+<https://www.cyberark.com/resources/threat-research-blog/securing-kubernetes-clusters-by-eliminating-risky-permissions>
 
 ```yaml
 apiVersion: v1
@@ -127,26 +193,59 @@ spec:
 
 <details><summary>Minimize host OS footprint (reduce attack surface)</summary>
 
+<https://blog.sonatype.com/kubesecops-kubernetes-security-practices-you-should-follow#:~:text=Reduce%20Kubernetes%20Attack%20Surfaces>
+
+<https://www.cisecurity.org/benchmark/distribution_independent_linux/>
+
+<https://www.cisecurity.org/benchmark/red_hat_linux/>
+
+<https://www.cisecurity.org/benchmark/debian_linux/>
+
+<https://www.cisecurity.org/benchmark/centos_linux/>
+
+<https://www.cisecurity.org/benchmark/suse_linux/>
+
+<https://www.cisecurity.org/benchmark/oracle_linux/>
+
 </details>
 
 <details><summary>Minimize IAM roles</summary>
+
+<https://digitalguardian.com/blog/what-principle-least-privilege-polp-best-practice-information-security-and-compliance>
+
+<https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html#grant-least-privilege>
 
 </details>
 
 <details><summary>Minimize external access to the network</summary>
 
 - set loadbalancer to ClusterIP
-- network policies
+- implement network policies
+
+<https://help.replicated.com/community/t/managing-firewalls-with-ufw-on-kubernetes/230>
+
+<https://www.linode.com/docs/security/firewalls/configure-firewall-with-ufw/>
+
+<https://docs.microsoft.com/en-us/azure/aks/concepts-security#azure-network-security-groups>
+
+<https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html>
+
+<https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html>
 
 </details>
 
-
 <details><summary>Appropriately use kernel hardening tools such as AppArmor, seccomp</summary>
 
+<https://www.sumologic.com/kubernetes/security/#security-best-practices>
+
+<https://cdn2.hubspot.net/hubfs/1665891/Assets/Container%20Security%20by%20Liz%20Rice%20-%20OReilly%20Apr%202020.pdf>
+
 <https://kubernetes.io/docs/tutorials/clusters/apparmor/>
+
 <https://kubernetes.io/docs/tutorials/clusters/seccomp/>
 
-Example pod with audit.json
+
+Seccomp example pod with audit.json
 
 ```bash
 apiVersion: v1
@@ -191,7 +290,9 @@ trigger the pod (curl ip:5678) and check the logs `tail -f /var/log/syslog | gre
 
 <details><summary>Setup appropriate OS level security domains e.g. using PSP, OPA, security contexts</summary>
 
-POD SECURITY POLICY
+### POD SECURITY POLICY
+
+Ensure PodSecurityPolicy admission controller is active! ( setting on API server)
 
 ```yaml
 apiVersion: policy/v1beta1
@@ -213,11 +314,19 @@ spec:
   - '*'
 ```
 
-http://blog.tundeoladipupo.com/2019/06/01/Kubernetes,-PodSecurityPolicy-and-Kubeadm/
+<http://blog.tundeoladipupo.com/2019/06/01/Kubernetes,-PodSecurityPolicy-and-Kubeadm/>
 
-OPEN POLICY AGENT
+<https://kubernetes.io/docs/concepts/policy/pod-security-policy/>
 
-SECURITY CONTEXT
+### OPEN POLICY AGENT
+
+<https://www.youtube.com/watch?v=Yup1FUc2Qn0>
+
+<https://kubernetes.io/blog/2019/08/06/opa-gatekeeper-policy-and-governance-for-kubernetes/>
+
+<https://www.openpolicyagent.org/docs/v0.12.2/kubernetes-admission-control/>
+
+### SECURITY CONTEXT
 
 <https://kubernetes.io/docs/tasks/configure-pod-container/security-context/>
 
@@ -271,19 +380,45 @@ KEY2=VALUE2
 
 `kubectl create secret tls tls-secret --cert=path/to/tls.cert --key=path/to/tls.key`
 
+<https://www.weave.works/blog/managing-secrets-in-kubernetes>
+
+<https://github.com/kubernetes-sigs/secrets-store-csi-driver>
+
 </details>
 
 <details><summary>Use container runtime sandboxes in multi-tenant environments (e.g. gvisor, kata containers)</summary>
+
+<https://gvisor.dev/docs/>
+
+<https://gvisor.dev/docs/user_guide/quick_start/kubernetes/>
+
+<https://thenewstack.io/how-to-implement-secure-containers-using-googles-gvisor/>
+
+<https://platform9.com/blog/kata-containers-docker-and-kubernetes-how-they-all-fit-together/>
+
+<https://github.com/kata-containers/documentation/blob/master/how-to/how-to-use-k8s-with-cri-containerd-and-kata.md>
+
 </details>
 
 <details><summary>Implement pod to pod encryption by use of mTLS</summary>
+
+<https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/>
+
+<https://developer.ibm.com/technologies/containers/tutorials/istio-security-mtls/>
+
+<https://codeburst.io/mutual-tls-authentication-mtls-de-mystified-11fa2a52e9cf>
+
+<https://www.istioworkshop.io/11-security/01-mtls/>
+
+<https://istio.io/latest/blog/2017/0.1-auth/>
+
+<https://linkerd.io/2/features/automatic-mtls/>
 
 </details>
 
 ## Supply Chain Security – 20%
 
 <details><summary>Minimize base image footprint</summary>
-
 
 <https://kubernetes.io/docs/concepts/workloads/pods/ephemeral-containers/>
 
@@ -293,23 +428,88 @@ KEY2=VALUE2
     gcr.io/distroless/java-debian10
     gcr.io/distroless/cc-debian10
 ```
+
+<https://cloud.google.com/blog/products/gcp/kubernetes-best-practices-how-and-why-to-build-small-container-images>
+
+<https://cloud.google.com/solutions/best-practices-for-building-containers#build-the-smallest-image-possible>
+
+<https://cloud.google.com/blog/products/gcp/7-best-practices-for-building-containers>
+
+<https://github.com/GoogleContainerTools/distroless>
+
 </details>
 
-<details><summary>Secure your supply chain: whitelist allowed registries, sign and validate images</summary></details>
+<details><summary>Secure your supply chain: whitelist allowed registries, sign and validate images</summary>
 
-<details><summary>Use static analysis of user workloads (e.g.Kubernetes resources, Docker files)</summary></details>
+<https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/>
 
-<details><summary>Scan images for known vulnerabilities</summary></details>
+<https://kubernetes.io/blog/2019/03/21/a-guide-to-kubernetes-admission-controllers/>
+
+<https://docs.docker.com/engine/security/trust/content_trust/>
+
+<https://stackoverflow.com/questions/54463125/how-to-reject-docker-registries-in-kubernetes>
+
+<https://github.com/kubernetes/kubernetes/issues/22888>
+
+<https://www.openpolicyagent.org/docs/latest/kubernetes-primer/>
+
+<https://medium.com/sse-blog/container-image-signatures-in-kubernetes-19264ac5d8ce>
+
+</details>
+
+<details><summary>Use static analysis of user workloads (e.g.Kubernetes resources, Docker files)</summary>
+
+<https://kube-score.com/>
+
+<https://bridgecrew.io/blog/kubernetes-static-code-analysis-with-checkov/>
+
+<https://github.com/quay/clair>
+
+</details>
+
+<details><summary>Scan images for known vulnerabilities</summary>
+
+<https://medium.com/better-programming/scan-your-docker-images-for-vulnerabilities-81d37ae32cb3>
+
+<https://github.com/leahnp/clair-klar-kubernetes-demo>
+
+</details>
 
 ## Monitoring, Logging and Runtime Security – 20%
 
-<details><summary>Perform behavioral analytics of syscall process and file activities at the host and container level to detect malicious activities</summary></details>
+<details><summary>Perform behavioral analytics of syscall process and file activities at the host and container level to detect malicious activities</summary>
 
-<details><summary>Detect threats within physical infrastructure, apps, networks, data, users and workloads</summary></details>
+<https://sysdig.com/blog/how-to-detect-kubernetes-vulnerability-cve-2019-11246-using-falco/>
 
-<details><summary>Detect all phases of attack regardless where it occurs and how it spreads</summary></details>
+<https://medium.com/@SkyscannerEng/kubernetes-security-monitoring-at-scale-with-sysdig-falco-a60cfdb0f67a>
 
-<details><summary>Perform deep analytical investigation and identification of bad actors within environment</summary></details>
+<https://kubernetes.io/docs/tutorials/clusters/seccomp/>
+
+</details>
+
+<details><summary>Detect threats within physical infrastructure, apps, networks, data, users and workloads</summary>
+
+<https://www.cncf.io/blog/2020/08/07/common-kubernetes-config-security-threats/>
+
+<https://www.trendmicro.com/vinfo/us/security/news/virtualization-and-cloud/guidance-on-kubernetes-threat-modeling>
+
+<https://www.microsoft.com/security/blog/2020/04/02/attack-matrix-kubernetes/>
+
+</details>
+
+<details><summary>Detect all phases of attack regardless where it occurs and how it spreads</summary
+
+<https://www.threatstack.com/blog/kubernetes-attack-scenarios-part-1>
+
+<https://www.optiv.com/explore-optiv-insights/source-zero/anatomy-kubernetes-attack-how-untrusted-docker-images-fail-us>
+
+></details>
+
+<details><summary>Perform deep analytical investigation and identification of bad actors within environment</summary>
+
+<https://www.stackrox.com/post/2020/05/kubernetes-security-101/>
+
+</details>
 
 <details><summary>Ensure immutability of containers at runtime</summary>
 
@@ -343,14 +543,43 @@ spec:
       - emptyDir: {}
         name: tmp
 ```
+
+<https://kubernetes.io/blog/2018/03/principles-of-container-app-design/>
+
+<https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/container_security_guide/keeping_containers_fresh_and_updateable#leveraging_kubernetes_and_openshift_to_ensure_that_containers_are_immutable>
+
+<https://medium.com/sroze/why-i-think-we-should-all-use-immutable-docker-images-9f4fdcb5212f>
+
+<https://techbeacon.com/enterprise-it/immutable-infrastructure-your-systems-can-rise-dead>
+
 </details>
 
-<details><summary>Use Audit Logs to monitor access</summary></details>
+<details><summary>Use Audit Logs to monitor access</summary>
 
-## Command reference 1.19
+<https://kubernetes.io/docs/tasks/debug-application-cluster/audit/>
+
+<https://www.datadoghq.com/blog/monitor-kubernetes-audit-logs/>
+
+<https://docs.sysdig.com/en/kubernetes-audit-logging.html>
+
+</details>
+
+## Command snippers and reference 
+
+kubectl is based on v1.19
+
+Use `kubectl run -o yaml --dry-run` to create a pod.yaml
+
+`kubectl run` has many commandline arguments for specific pod/container configurations
+
+Use `kubectl create deployment -o yaml --dry-run` to create a deployment.yaml
+
+Merge them together in an editor - be carefull of indentation
+
 
 ```bash
-kubectl explain
+kubectl explain  <type>.<fieldName>[.<fieldName>]
+kubectl explain pod.spec.containers  *CASE SENSITIVE*
 kubectl config get-contexts
 kubectl config set-context CONTEXT_NAME [--namespace=namespace]
 kubectl config use-context CONTEXT_NAME
@@ -406,7 +635,7 @@ kubectl top
 iptables -t nat -L KUBE-SERVICES
 ```
 
-## Referenced sites
+## Other usefull sites
 
 <https://github.com/David-VTUK/CKA-StudyGuide/blob/master/RevisionTopics/Part-5-Security.md>
 
@@ -414,7 +643,7 @@ iptables -t nat -L KUBE-SERVICES
 
 <https://cloud.google.com/blog/products/gcp/7-best-practices-for-building-containers>
 
-## other CKS preparation sites
+## Other CKS preparation sites
 
 <https://blog.nativecloud.dev/how-to-prepare-for-the-upcoming-cks-certification/>
 
@@ -446,9 +675,9 @@ URLs allowed in browser (only one tab)
 - Ctrl+W is a keyboard shortcut that will close the current tab in Google Chrome.
 - Ctrl+C & and Ctrl+V are not supported in your exam terminal.
 - To copy and paste text, please use;
--- For Linux: select text for copy and middle button for paste (or both left and right simultaneously if you have no middle button).
--- For Mac: ⌘+C to copy and ⌘+V to paste.
--- For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
+  - For Linux: select text for copy and middle button for paste (or both left and right simultaneously if you have no middle button).
+  - For Mac: ⌘+C to copy and ⌘+V to paste.
+  - For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
 - In addition, you might find it helpful to use the Notepad (see top menu under 'Exam Controls') to manipulate text before pasting to the command line.
 - Installation of services and applications included in this exam may require modification of system security policies to successfully complete.
 - Only a single terminal console is available during the exam. Terminal multiplexers such as GNU Screen and tmux can be used to create virtual consoles.
