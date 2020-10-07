@@ -365,3 +365,8 @@ docker stat / inspect
 kubectl top
 
 iptables -t nat -L KUBE-SERVICES
+```
+
+## references
+
+<https://github.com/David-VTUK/CKA-StudyGuide/blob/master/RevisionTopics/Part-5-Security.md>
