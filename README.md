@@ -335,7 +335,7 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/l
 
 ## Cluster Hardening – 15%
 
-<details><summary>Restrict access to Kubernetes API (*)</summary>
+<details><summary>Restrict access to Kubernetes API</summary>
 
 ```bash
 kubectl create clusterrole
@@ -456,7 +456,7 @@ spec:
 
 </details>
 
-<details><summary>Update Kubernetes frequently (*)</summary>
+<details><summary>Update Kubernetes frequently</summary>
 
 <https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/>
 
