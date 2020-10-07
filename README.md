@@ -370,3 +370,5 @@ iptables -t nat -L KUBE-SERVICES
 ## references
 
 <https://github.com/David-VTUK/CKA-StudyGuide/blob/master/RevisionTopics/Part-5-Security.md>
+
+<https://blog.nativecloud.dev/how-to-prepare-for-the-upcoming-cks-certification/>
