@@ -51,7 +51,11 @@ spec:
 
 ### Verify platform binaries before deploying
 
+```bash
 echo -n "bla" | sha256sum
+cat <binary> | sha256sum
+cat <binary> | sha512sum
+```
 
 <https://kubernetes.io/docs/setup/release/notes/#client-binaries>
 
