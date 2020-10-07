@@ -396,7 +396,9 @@ iptables -t nat -L KUBE-SERVICES
 Allow in tabs
 
 <https://kubernetes.io/docs/>
+
 <https://github.com/kubernetes/>
+
 <https://kubernetes.io/blog/>
 
 - Root privileges can be obtained by running 'sudo −i'.
@@ -407,9 +409,9 @@ Allow in tabs
 - Ctrl+W is a keyboard shortcut that will close the current tab in Google Chrome.
 - Ctrl+C & and Ctrl+V are not supported in your exam terminal.
 - To copy and paste text, please use;
-- For Linux: select text for copy and middle button for paste (or both left and right simultaneously if you have no middle button).
-- For Mac: ⌘+C to copy and ⌘+V to paste.
-- For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
+-- For Linux: select text for copy and middle button for paste (or both left and right simultaneously if you have no middle button).
+-- For Mac: ⌘+C to copy and ⌘+V to paste.
+-- For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
 - In addition, you might find it helpful to use the Notepad (see top menu under 'Exam Controls') to manipulate text before pasting to the command line.
 - Installation of services and applications included in this exam may require modification of system security policies to successfully complete.
 - Only a single terminal console is available during the exam. Terminal multiplexers such as GNU Screen and tmux can be used to create virtual consoles.
