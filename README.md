@@ -1,8 +1,6 @@
 # CKS
 
-## Preparations
-
-Build a v1.19 'kubeadm' cluster on Ubuntu 18 with a dedicated master and worker node 
+Sections with a (*) are in progress and only have links and not yet additional content
 
 ## Cluster Setup – 10%
 
@@ -123,6 +121,10 @@ spec:
 
 <details><summary>Use CIS benchmark to review the security configuration of Kubernetes components (etcd, kubelet, kubedns, kubeapi)</summary>
 
+CIS Kubernetes Benchmark v1.6.0
+
+<https://learn.cisecurity.org/l/799323/2020-07-22/28v4r>
+
 <https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks>
 
 <https://www.cisecurity.org/benchmark/kubernetes/>
@@ -172,10 +174,54 @@ spec:
 
 <https://kubernetes.io/docs/concepts/services-networking/ingress/#tls>
 
-
 </details>
 
 <details><summary>Protect node metadata and endpoints</summary>
+
+Implement taints & tolerations to place workload
+
+Implement nodeselector to place workload
+
+Implement networksecuritypolicy to prevent access to metadata endpoint
+
+Example code to get metadata on Azure
+```bash
+curl -H Metadata:true "http://169.254.169.254/metadata/instance?api-version=2020-06-01"
+wget -qO- --header="Metadata:true" "http://169.254.169.254/metadata/instance?api-version=2020-06-01"
+```
+
+Create network policy file
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-specific-endpoint
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+        except:
+        - 169.254.169.254/32
+```
+
+Create namespace `kubectl create ns test`
+
+Apply policy `kubectl apply -f <file> -n test`
+
+Run a busybox pod `kubectl run wget --image=busybox:1.28 -n test -it --rm /bin/sh`
+
+Test
+
+```bash
+wget ...
+```
+
+Other links:
 
 <https://kubernetes.io/blog/2016/03/how-container-metadata-changes-your-point-of-view/>
 
@@ -196,6 +242,74 @@ spec:
 <https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>
 
 <https://blog.heptio.com/on-securing-the-kubernetes-dashboard-16b09b1b7aca>
+
+Create AKS cluster
+
+```bash
+az group create -n rg002 -l westeurope
+az aks create -n aks002 -g rg002 --node-count 1 -k 1.19.0
+az aks get-credentials -n aks002 -g rg002 --admin
+az aks install-cli --client-version 1.19.0
+copy .azure-kubectl\kubectl.exe c:\SHORTCUTS
+kubectl version
+```
+
+name: clusterAdmin_rg002_aks002 
+organization: system:masters
+
+decode cert `openssl x509 -in cert.crt -text -noout`
+
+Run `kubectl proxy`
+
+Go to <http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#/login>
+
+Clean up
+
+```bash
+az group delete -g rg002 --no-wait -y
+```
+
+To secure the dashboard
+
+DO NOT SET THE SERVICE TO TYPE LOAD BALANCER
+
+```
+kube-system   kubernetes-dashboard        ClusterIP   10.0.145.168   <none>        443/TCP         21m
+```
+
+ALTERNATIVE WAY TO ACCESS DASHBOARD
+
+`kubectl port-forward service/kubernetes-dashboard -n kube-system 8443:443`
+
+<https://localhost:8443>
+
+```
+kubectl get serviceAccounts <service-account-name> -n <namespace> -o=jsonpath={.secrets[*].name}
+kubectl get secret <service-account-secret-name> -n <namespace> -o json
+
+kubectl get serviceAccounts kubernetes-dashboard -n kube-system -o=jsonpath={.secrets[*].name}
+kubectl get secret kubernetes-dashboard-token-nxd89 -n kube-system -o json
+```
+
+IMPLEMENT RBAC
+
+LIMIT ACCESS FROM THE kubernetes-dashboard SERVICE ACCOUNT
+
+`kubectl get clusterrolebinding kubernetes-dashboard -o yaml`
+
+```yaml
+rules:
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+```
+
 
 </details>
 
@@ -221,7 +335,67 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/l
 
 ## Cluster Hardening – 15%
 
-<details><summary>Restrict access to Kubernetes API</summary>
+<details><summary>Restrict access to Kubernetes API (*)</summary>
+
+```bash
+kubectl create clusterrole
+kubectl create role
+kubectl create clusterrolebinding
+kubectl create rolebinding
+```
+
+```bash
+kubectl create serviceaccount podreader
+kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods
+kubectl create rolebinding podr-view --role=pod-reader --serviceaccount=default:podreader 
+```
+
+(clusterrole is *not* namespace bound)
+
+Users: create and sign a cert - username = common name ( group = organization )
+
+ServiceAccount: create service account, authenticate with bearer token
+
+```bash
+kubectl get serviceAccounts <service-account-name> -n <namespace> -o=jsonpath={.secrets[*].name}
+kubectl get secret <service-account-secret-name> -n <namespace> -o json
+```
+
+```bash
+openssl genrsa -out ted.key 2048
+openssl req -new -key ted.key -subj "/CN=ted" -out ted.csr
+
+cat <<EOF | kubectl apply -f -
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: ted
+spec:
+  request: $(cat ted.csr | base64 | tr -d '\n')
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - client auth
+EOF
+
+kubectl describe csr ted
+
+kubectl get csr
+
+kubectl certificate approve ted
+
+kubectl get csr ted -o jsonpath='{.status.certificate}' | base64 --decode > ted.crt
+
+mv ~/.kube/config ~/.kube/config.org
+
+kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443 
+
+kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods --kubeconfig=/root/.kube/config.org
+kubectl create rolebinding podr-view --role=pod-reader --user=ted  --kubeconfig=/root/.kube/config.org
+
+kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443 
+
+mv ~/.kube/config.org ~/.kube/config
+```
 
 <https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/>
 
@@ -231,7 +405,9 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/l
 
 </details>
 
-<details><summary>Use Role Based Access Controls to minimize exposure</summary>
+<details><summary>Use Role Based Access Controls to minimize exposure </summary>
+
+See previous section
 
 <https://kubernetes.io/docs/reference/access-authn-authz/rbac/>
 
@@ -245,19 +421,6 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/l
 
 <details><summary>Exercise caution in using service accounts e.g. disable defaults, minimize permissions on newly created ones</summary>
 
-<https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/>
-
-<https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/>
-
-<https://docs.armory.io/docs/armory-admin/manual-service-account/>
-
-<https://stackoverflow.com/questions/52583497/how-to-disable-the-use-of-a-default-service-account-by-a-statefulset-deployments>
-
-<https://thenewstack.io/kubernetes-access-control-exploring-service-accounts/>
-
-<https://github.com/kubernetes/kubernetes/issues/57601>
-
-<https://www.cyberark.com/resources/threat-research-blog/securing-kubernetes-clusters-by-eliminating-risky-permissions>
 
 ```yaml
 apiVersion: v1
@@ -276,11 +439,87 @@ spec:
   serviceAccountName: build-robot
   automountServiceAccountToken: false
 ```
+
+<https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/>
+
+<https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/>
+
+<https://docs.armory.io/docs/armory-admin/manual-service-account/>
+
+<https://stackoverflow.com/questions/52583497/how-to-disable-the-use-of-a-default-service-account-by-a-statefulset-deployments>
+
+<https://thenewstack.io/kubernetes-access-control-exploring-service-accounts/>
+
+<https://github.com/kubernetes/kubernetes/issues/57601>
+
+<https://www.cyberark.com/resources/threat-research-blog/securing-kubernetes-clusters-by-eliminating-risky-permissions>
+
 </details>
 
-<details><summary>Update Kubernetes frequently</summary>
+<details><summary>Update Kubernetes frequently (*)</summary>
 
 <https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/>
+
+Two nodes, VM0 & VM1
+Version 1.19.0
+
+On VM0
+
+```bash
+apt-mark unhold kubeadm
+apt-mark unhold kubelet
+apt-get update
+apt-get install -y kubeadm=1.19.2-00
+apt-mark hold kubeadm
+kubeadm version
+kubectl drain vm0 --ignore-daemonsets --force
+kubeadm upgrade plan
+kubeadm upgrade apply v1.19.2
+apt-get install -y kubelet=1.19.2-00
+kubectl uncordon vm0
+```
+
+On VM1
+
+```bash
+apt-mark unhold kubeadm
+apt-get update
+apt-get install -y kubeadm=1.19.2-00
+apt-mark hold kubeadm
+kubeadm version
+kubectl drain vm1 --ignore-daemonsets --force
+kubeadm upgrade node
+apt-get install -y kubelet=1.19.2-00
+kubectl uncordon vm1
+```
+
+`kubectl get componentstatuses`
+
+```
+root@vm0:~# kubectl get pods -o wide
+NAME    READY   STATUS    RESTARTS   AGE   IP          NODE   NOMINATED NODE   READINESS GATES
+nginx   1/1     Running   0          59s   10.44.0.1   vm1    <none>           <none>
+root@vm0:~# kubectl get pods -o wide -A
+NAMESPACE     NAME                          READY   STATUS    RESTARTS   AGE   IP          NODE   NOMINATED NODE   READINESS GATES
+default       nginx                         1/1     Running   0          61s   10.44.0.1   vm1    <none>           <none>
+kube-system   coredns-f9fd979d6-pj6bt       1/1     Running   1          10m   10.32.0.3   vm0    <none>           <none>
+kube-system   coredns-f9fd979d6-qnb62       1/1     Running   1          10m   10.32.0.2   vm0    <none>           <none>
+kube-system   etcd-vm0                      1/1     Running   1          13m   10.0.0.4    vm0    <none>           <none>
+kube-system   kube-apiserver-vm0            1/1     Running   1          11m   10.0.0.4    vm0    <none>           <none>
+kube-system   kube-controller-manager-vm0   1/1     Running   2          11m   10.0.0.4    vm0    <none>           <none>
+kube-system   kube-proxy-6x6vx              1/1     Running   1          10m   10.0.0.4    vm0    <none>           <none>
+kube-system   kube-proxy-zdwpj              1/1     Running   0          10m   10.0.0.5    vm1    <none>           <none>
+kube-system   kube-scheduler-vm0            1/1     Running   2          11m   10.0.0.4    vm0    <none>           <none>
+kube-system   weave-net-dshq4               2/2     Running   0          34h   10.0.0.5    vm1    <none>           <none>
+kube-system   weave-net-wqrqs               2/2     Running   3          34h   10.0.0.4    vm0    <none>           <none>
+root@vm0:~# kubectl get nodes -o wide
+NAME   STATUS   ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+vm0    Ready    master   34h   v1.19.2   10.0.0.4      <none>        Ubuntu 18.04.5 LTS   5.4.0-1026-azure   docker://19.3.6
+vm1    Ready    <none>   34h   v1.19.2   10.0.0.5      <none>        Ubuntu 18.04.5 LTS   5.4.0-1026-azure   docker://19.3.6
+root@vm0:~# kubectl version
+Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.0", GitCommit:"e19964183377d0ec2052d1f1fa930c4d7575bd50", GitTreeState:"clean", BuildDate:"2020-08-26T14:30:33Z", GoVersion:"go1.15", Compiler:"gc", Platform:"linux/amd64"}
+Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.2", GitCommit:"f5743093fd1c663cb0cbc89748f730662345d44d", GitTreeState:"clean", BuildDate:"2020-09-16T13:32:58Z", GoVersion:"go1.15", Compiler:"gc", Platform:"linux/amd64"}
+```
 
 <https://kubernetes.io/docs/setup/release/notes/#client-binaries>
 
@@ -288,7 +527,7 @@ spec:
 
 ## System Hardening – 15%
 
-<details><summary>Minimize host OS footprint (reduce attack surface)</summary>
+<details><summary>Minimize host OS footprint (reduce attack surface) (*)</summary>
 
 <https://blog.sonatype.com/kubesecops-kubernetes-security-practices-you-should-follow#:~:text=Reduce%20Kubernetes%20Attack%20Surfaces>
 
@@ -306,7 +545,7 @@ spec:
 
 </details>
 
-<details><summary>Minimize IAM roles</summary>
+<details><summary>Minimize IAM roles (*)</summary>
 
 <https://digitalguardian.com/blog/what-principle-least-privilege-polp-best-practice-information-security-and-compliance>
 
@@ -385,7 +624,7 @@ trigger the pod (curl ip:5678) and check the logs `tail -f /var/log/syslog | gre
 
 ## Minimize Microservice Vulnerabilities – 20%
 
-<details><summary>Setup appropriate OS level security domains e.g. using PSP, OPA, security contexts</summary>
+<details><summary>Setup appropriate OS level security domains e.g. using PSP, OPA (*), security contexts</summary>
 
 ### POD SECURITY POLICY
 
@@ -415,7 +654,7 @@ spec:
 
 <https://kubernetes.io/docs/concepts/policy/pod-security-policy/>
 
-### OPEN POLICY AGENT
+### OPEN POLICY AGENT 
 
 <https://www.youtube.com/watch?v=Yup1FUc2Qn0>
 
@@ -483,7 +722,7 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Use container runtime sandboxes in multi-tenant environments (e.g. gvisor, kata containers)</summary>
+<details><summary>Use container runtime sandboxes in multi-tenant environments (e.g. gvisor, kata containers) (*)</summary>
 
 <https://gvisor.dev/docs/>
 
@@ -497,7 +736,7 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Implement pod to pod encryption by use of mTLS</summary>
+<details><summary>Implement pod to pod encryption by use of mTLS (*)</summary>
 
 <https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/>
 
@@ -536,7 +775,9 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Secure your supply chain: whitelist allowed registries, sign and validate images</summary>
+<details><summary>Secure your supply chain: whitelist allowed registries, sign and validate images (*)</summary>
+
+<https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#imagepolicywebhook>
 
 <https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/>
 
@@ -554,7 +795,7 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Use static analysis of user workloads (e.g.Kubernetes resources, Docker files)</summary>
+<details><summary>Use static analysis of user workloads (e.g.Kubernetes resources, Docker files) (*)</summary>
 
 <https://kube-score.com/>
 
@@ -564,7 +805,7 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Scan images for known vulnerabilities</summary>
+<details><summary>Scan images for known vulnerabilities (*)</summary>
 
 <https://medium.com/better-programming/scan-your-docker-images-for-vulnerabilities-81d37ae32cb3>
 
@@ -574,7 +815,7 @@ KEY2=VALUE2
 
 ## Monitoring, Logging and Runtime Security – 20%
 
-<details><summary>Perform behavioral analytics of syscall process and file activities at the host and container level to detect malicious activities</summary>
+<details><summary>Perform behavioral analytics of syscall process and file activities at the host and container level to detect malicious activities (*)</summary>
 
 <https://sysdig.com/blog/how-to-detect-kubernetes-vulnerability-cve-2019-11246-using-falco/>
 
@@ -584,7 +825,7 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Detect threats within physical infrastructure, apps, networks, data, users and workloads</summary>
+<details><summary>Detect threats within physical infrastructure, apps, networks, data, users and workloads (*)</summary>
 
 <https://www.cncf.io/blog/2020/08/07/common-kubernetes-config-security-threats/>
 
@@ -594,7 +835,7 @@ KEY2=VALUE2
 
 </details>
 
-<details><summary>Detect all phases of attack regardless where it occurs and how it spreads</summary
+<details><summary>Detect all phases of attack regardless where it occurs and how it spreads (*)</summary
 
 <https://www.threatstack.com/blog/kubernetes-attack-scenarios-part-1>
 
@@ -602,7 +843,7 @@ KEY2=VALUE2
 
 ></details>
 
-<details><summary>Perform deep analytical investigation and identification of bad actors within environment</summary>
+<details><summary>Perform deep analytical investigation and identification of bad actors within environment (*)</summary>
 
 <https://www.stackrox.com/post/2020/05/kubernetes-security-101/>
 
@@ -610,7 +851,9 @@ KEY2=VALUE2
 
 <details><summary>Ensure immutability of containers at runtime</summary>
 
-```
+Create a pod with a readonlyrootfilesystem and writeable /tmp dir
+
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -653,6 +896,15 @@ spec:
 
 <details><summary>Use Audit Logs to monitor access</summary>
 
+Set `--audit-policy-file` on api server
+
+```
+--audit-policy-file string
+	Path to the file that defines the audit policy configuration.
+```
+
+Example of audit-policy-file: <https://kubernetes.io/docs/tasks/debug-application-cluster/audit/>
+
 <https://kubernetes.io/docs/tasks/debug-application-cluster/audit/>
 
 <https://www.datadoghq.com/blog/monitor-kubernetes-audit-logs/>
@@ -660,6 +912,10 @@ spec:
 <https://docs.sysdig.com/en/kubernetes-audit-logging.html>
 
 </details>
+
+## Preparations
+
+Build a v1.19 'kubeadm' cluster on Ubuntu 18 with a dedicated master and worker node 
 
 ## Command snippers and reference 
 
