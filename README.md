@@ -230,7 +230,9 @@ spec:
 <https://kubernetes.io/docs/concepts/configuration/secret/>
 
 `kubectl create secret generic NAME --from-literal=KEY=VALUE`
+
 `kubectl create secret generic NAME --from-file=KEY=file.txt`
+
 `kubectl create secret generic NAME --from-env-file=file.env`
 
 file.env
@@ -245,8 +247,6 @@ KEY2=VALUE2
 ### Use container runtime sandboxes in multi-tenant environments (e.g. gvisor, kata containers)
 
 ### Implement pod to pod encryption by use of mTLS
-
-
 
 ## Supply Chain Security – 20%
 
