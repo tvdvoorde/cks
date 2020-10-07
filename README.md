@@ -2,17 +2,20 @@
 
 ## Cluster Setup – 10%
 
-### Use Network security policies to restrict cluster level access
+
+<details><summary>Use Network security policies to restrict cluster level access</summary>
 
 ```bash
 kubectl explain NetworkPolicy.spec
 ```
+</details>
 
-### Use CIS benchmark to review the security configuration of Kubernetes components (etcd, kubelet, kubedns, kubeapi)
+<details><summary>Use CIS benchmark to review the security configuration of Kubernetes components (etcd, kubelet, kubedns, kubeapi)</summary>
 
 ???
+</details>
 
-### Properly set up Ingress objects with security control
+<details><summary>Properly set up Ingress objects with security control</summary>
 
 ```yaml
 apiVersion: extensions/v1beta1
@@ -41,15 +44,21 @@ spec:
           servicePort: 80
 ```
 
-### Protect node metadata and endpoints
+</details>
+
+<details><summary>Protect node metadata and endpoints</summary>
 
 <https://kubernetes.io/blog/2016/03/how-container-metadata-changes-your-point-of-view/>
 
-### Minimize use of, and access to, GUI elements
+</details>
+
+<details><summary>Minimize use of, and access to, GUI elements</summary>
 
 <https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/>
 
-### Verify platform binaries before deploying
+</details>
+
+<details><summary>Verify platform binaries before deploying</summary>
 
 ```bash
 echo -n "bla" | sha256sum
@@ -65,18 +74,23 @@ cat <binary> | sha512sum
 curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
 curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/linux/amd64/kubectl
 ```
+</details>
 
 ## Cluster Hardening – 15%
 
-### Restrict access to Kubernetes API
+<details><summary>Restrict access to Kubernetes API</summary>
 
 <https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/>
 
-### Use Role Based Access Controls to minimize exposure
+</details>
+
+<details><summary>Use Role Based Access Controls to minimize exposure</summary>
 
 <https://kubernetes.io/docs/reference/access-authn-authz/rbac/>
 
-### Exercise caution in using service accounts e.g. disable defaults, minimize permissions on newly created ones
+</details>
+
+<details><summary>Exercise caution in using service accounts e.g. disable defaults, minimize permissions on newly created ones</summary>
 
 <https://kubernetes.io/docs/tasks/tools/install-kubectl/>
 
@@ -99,12 +113,15 @@ spec:
   serviceAccountName: build-robot
   automountServiceAccountToken: false
 ```
+</details>
 
-### Update Kubernetes frequently
+<details><summary>Update Kubernetes frequently</summary>
 
 <https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/>
 
 <https://kubernetes.io/docs/setup/release/notes/#client-binaries>
+
+</details>
 
 ## System Hardening – 15%
 
