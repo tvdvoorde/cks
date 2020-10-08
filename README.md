@@ -630,6 +630,27 @@ trigger the pod (curl ip:5678) and check the logs `tail -f /var/log/syslog | gre
 
 Ensure PodSecurityPolicy admission controller is active! ( setting on API server)
 
+Edit `etc/kubernetes/manifests/kubeapiserver.yaml` on the master node and set the `--enable-admission-plugins parameter`
+
+```bash
+--enable-admission-plugins=...,PodSecurityPolicy,...
+```
+
+For kubeadm, create a config file with
+
+```yaml
+...
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+apiServer:
+  extraArgs:
+    enable-admission-plugins:  PodSecurityPolicy,LimitRanger,ResourceQuota,AlwaysPullImages,DefaultStorageClass
+```
+
+and init cluster with that file to enabel PodSecurityPolicy
+
+`kubeadm init --config kubeadm.json`
+
 ```yaml
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
