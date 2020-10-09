@@ -759,6 +759,53 @@ KEY2=VALUE2
 
 <details><summary>Implement pod to pod encryption by use of mTLS (*)</summary>
 
+Not pod-to-pod, but general background on mutual TLS:
+
+<https://medium.com/@awkwardferny/configuring-certificate-based-mutual-authentication-with-kubernetes-ingress-nginx-20e7e38fdfca>
+
+```bash
+openssl req -x509 -sha256 -newkey rsa:4096 -keyout ca.key -out ca.crt -days 356 -nodes -subj '/CN=Fern Cert Authority'
+openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr -nodes -subj '/CN=meow.com'
+openssl x509 -req -sha256 -days 365 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
+openssl req -new -newkey rsa:4096 -keyout client.key -out client.csr -nodes -subj '/CN=Fern'
+openssl x509 -req -sha256 -days 365 -in client.csr -CA ca.crt -CAkey ca.key -set_serial 02 -out client.crt
+
+kubectl create secret generic my-certs --from-file=tls.crt=server.crt --from-file=tls.key=server.key --from-file=ca.crt=ca.crt
+
+...meow.com >> /etc/hosts
+```
+
+ingress example
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: \"on\"
+    nginx.ingress.kubernetes.io/auth-tls-secret: \"default/my-certs\"
+  name: meow-ingress
+  namespace: default
+spec:
+  rules:
+  - host: meow.com
+    http:
+      paths:
+      - backend:
+          serviceName: meow-svc
+          servicePort: 80
+        path: /
+  tls:
+  - hosts:
+    - meow.com
+    secretName: my-certs
+```
+
+```bash
+curl https://meow.com/ -k
+curl https://meow.com/ --cert client.crt --key client.key -k
+```
+
 <https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/>
 
 <https://developer.ibm.com/technologies/containers/tutorials/istio-security-mtls/>
