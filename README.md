@@ -624,7 +624,7 @@ trigger the pod (curl ip:5678) and check the logs `tail -f /var/log/syslog | gre
 
 ## Minimize Microservice Vulnerabilities – 20%
 
-<details><summary>Setup appropriate OS level security domains e.g. using PSP, OPA (*), security contexts</summary>
+<details><summary>Setup appropriate OS level security domains e.g. using PSP, OPA, security contexts</summary>
 
 ### POD SECURITY POLICY
 
