@@ -1128,21 +1128,12 @@ iptables -t nat -L KUBE-SERVICES
 `sudo -i` interactive sudo prompt
 `sudo cmd` execute command with sudo priv
 
-```
+```bash
 chmod <owner><group><other> <file>
 chown <owner>[:<group>] <file>
 ```
 
 users: `/etc/passwd/` ( `<username>:<password>:<UID>:<GID>` )
-
-	
-
-	
-	
-
-
-
-
 
 ## Other usefull sites
 
