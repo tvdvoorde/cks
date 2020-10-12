@@ -928,12 +928,15 @@ curl https://meow.com/ --cert client.crt --key client.key -k
 
 <https://kube-score.com/>
 
+```
+kubectl api-resources --verbs=list --namespaced -o name \
+  | xargs -n1 -I{} bash -c "kubectl get {} --all-namespaces -oyaml && echo ---" \
+  | kube-score score -
+```
+
+
 <https://bridgecrew.io/blog/kubernetes-static-code-analysis-with-checkov/>
 
-<https://github.com/quay/clair>
-
-clair used postgress db
-clair uses config.yaml, create as secret, mount as file
 
 ```bash
 clairctl report --host http://myhost IMAGEN_NAME
@@ -945,9 +948,58 @@ then
 fi
 ```
 
+```bash
+brew install kube-score/tap/kube-score
+cd /home/azureuser/.linuxbrew/Cellar/kube-score/1.9.0
+cd bin
+kubectl run nginx --image=nginx
+kubectl get pod nginx -o yaml|./kube-score score -
+```
+
 </details>
 
-<details><summary>Scan images for known vulnerabilities (*)</summary>
+<details><summary>Scan images for known vulnerabilities </summary>
+
+<https://github.com/quay/clair>
+
+clair used postgress db
+clair uses config.yaml, create as secret, mount as file
+
+```bash
+git clone --single-branch --branch release-2.0 https://github.com/coreos/clair
+cd contrib
+cd k8s
+kubectl create secret generic clairsecret --from-file=./config.yaml
+kubectl create -f clair-kubernetes.yaml
+curl -X GET -I http://10.96.228.33:6061/health
+wget https://github.com/optiopay/klar/releases/download/v2.4.0/klar-2.4.0-linux-amd64
+mv klar-2.4.0-linux-amd64 klar
+chmod +x klar
+
+CLAIR_ADDR=10.96.228.33:6060 \
+CLAIR_OUTPUT=High \
+CLAIR_THRESHOLD=10 \
+klar tvdvoorde/api1
+```
+
+config.yml
+```
+clair:
+ port: 6060
+ healthPort: 6061
+ request:
+ host: HOST
+ headers:
+ myHeader: header
+ uri: http://10.96.228.33
+ report:
+ path: ./reports
+ format: html
+```
+
+```bash
+./clairctl --config=config.yml report tvdvoorde/api1:latest
+```
 
 <https://medium.com/better-programming/scan-your-docker-images-for-vulnerabilities-81d37ae32cb3>
 
@@ -1153,9 +1205,49 @@ iptables -t nat -L KUBE-SERVICES
 chmod +x <file>
 chmod <owner><group><other> <file>
 chown <owner>[:<group>] <file>
+
+cat <<EOF > /root/.ssh/id_rsa
+-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAnMWXE21Y+5
+...
+EOF
+
+chmod 600 /root/.ssh/id_rsa
+
+
+groupadd <NEW_GROUP>
+usermod -a -G <GROUP> <USER>
+usermod -g <GROUP> <USER>
+passwd <PASSWORD>
+groups
+id
+
 ```
 
 users: `/etc/passwd/` ( `<username>:<password>:<UID>:<GID>` )
+
+accessing cluster
+
+```
+kubectl config view -o jsonpath='{"Cluster name\tServer\n"}{range .clusters[*]}{.name}{"\t"}{.cluster.server}{"\n"}{end}'
+export CLUSTER_NAME="aks002"
+APISERVER=$(kubectl config view -o jsonpath="{.clusters[?(@.name==\"$CLUSTER_NAME\")].cluster.server}")
+TOKEN=$(kubectl get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.token}"|base64 --decode) 
+
+curl -X GET $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
+
+
+
+kubectl run nginx --image=nginx --restart=Never
+
+kubectl exec nginx -it /bin/sh
+
+# TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+# curl -X GET "https://kubernetes/api" --header "Authorization: Bearer $TOKEN" --insecure
+
+
+
+```
 
 ## Other usefull sites
 
