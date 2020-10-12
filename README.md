@@ -1081,8 +1081,22 @@ kubectl logs POD_NAME -c CONTAINER_NAME --tail=5 -f
 ```
 
 ```bash
+<<HERE (here doc) - provides stdin till repeat of HERE keyword
+cat<<EOF>1.yaml
+---
+EOF
+
+cat<<EOF|kubectl apply -f -
+---
+EOF
+
+kubectl apply -f -<<EOF
+---
+EOF
+
+
 cat>1.yaml<<EOF
-bla
+---
 EOF
 
 ls -ltr
@@ -1108,6 +1122,27 @@ kubectl top
 
 iptables -t nat -L KUBE-SERVICES
 ```
+
+### Linux security
+
+`sudo -i` interactive sudo prompt
+`sudo cmd` execute command with sudo priv
+
+```
+chmod <owner><group><other> <file>
+chown <owner>[:<group>] <file>
+```
+
+users: `/etc/passwd/` ( `<username>:<password>:<UID>:<GID>` )
+
+	
+
+	
+	
+
+
+
+
 
 ## Other usefull sites
 
