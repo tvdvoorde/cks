@@ -140,7 +140,6 @@ kubectl get pod
 kubectl logs kube-bench-vpqbg
 ```
 
-
 <https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks#default-values>
 
 </details>
@@ -193,6 +192,7 @@ Implement nodeselector to place workload
 Implement networksecuritypolicy to prevent access to metadata endpoint
 
 Example code to get metadata on Azure
+
 ```bash
 curl -H Metadata:true "http://169.254.169.254/metadata/instance?api-version=2020-06-01"
 wget -qO- --header="Metadata:true" "http://169.254.169.254/metadata/instance?api-version=2020-06-01"
@@ -262,7 +262,7 @@ copy .azure-kubectl\kubectl.exe c:\SHORTCUTS
 kubectl version
 ```
 
-name: clusterAdmin_rg002_aks002 
+name: clusterAdmin_rg002_aks002
 organization: system:masters
 
 decode cert `openssl x509 -in cert.crt -text -noout`
@@ -281,7 +281,7 @@ To secure the dashboard
 
 DO NOT SET THE SERVICE TO TYPE LOAD BALANCER
 
-```
+```bash
 kube-system   kubernetes-dashboard        ClusterIP   10.0.145.168   <none>        443/TCP         21m
 ```
 
@@ -291,7 +291,7 @@ ALTERNATIVE WAY TO ACCESS DASHBOARD
 
 <https://localhost:8443>
 
-```
+```bash
 kubectl get serviceAccounts <service-account-name> -n <namespace> -o=jsonpath={.secrets[*].name}
 kubectl get secret <service-account-secret-name> -n <namespace> -o json
 
@@ -318,7 +318,6 @@ rules:
   - watch
 ```
 
-
 </details>
 
 <details><summary>Verify platform binaries before deploying</summary>
@@ -339,6 +338,7 @@ cat <binary> | sha512sum
 curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
 curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/linux/amd64/kubectl
 ```
+
 </details>
 
 ## Cluster Hardening – 15%
@@ -395,12 +395,12 @@ kubectl get csr ted -o jsonpath='{.status.certificate}' | base64 --decode > ted.
 
 mv ~/.kube/config ~/.kube/config.org
 
-kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443 
+kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443
 
 kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods --kubeconfig=/root/.kube/config.org
 kubectl create rolebinding podr-view --role=pod-reader --user=ted  --kubeconfig=/root/.kube/config.org
 
-kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443 
+kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443
 
 mv ~/.kube/config.org ~/.kube/config
 ```
@@ -428,7 +428,6 @@ See previous section
 </details>
 
 <details><summary>Exercise caution in using service accounts e.g. disable defaults, minimize permissions on newly created ones</summary>
-
 
 ```yaml
 apiVersion: v1
@@ -503,7 +502,7 @@ kubectl uncordon vm1
 
 `kubectl get componentstatuses`
 
-```
+```bash
 root@vm0:~# kubectl get pods -o wide
 NAME    READY   STATUS    RESTARTS   AGE   IP          NODE   NOMINATED NODE   READINESS GATES
 nginx   1/1     Running   0          59s   10.44.0.1   vm1    <none>           <none>
@@ -683,7 +682,7 @@ spec:
 
 <https://kubernetes.io/docs/concepts/policy/pod-security-policy/>
 
-### OPEN POLICY AGENT 
+### OPEN POLICY AGENT
 
 <https://www.youtube.com/watch?v=Yup1FUc2Qn0>
 
@@ -694,7 +693,7 @@ spec:
 
 Example:
 
-```
+```yaml
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
@@ -728,7 +727,7 @@ spec:
         }
 ```
 
-```
+```yaml
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredLabels
 metadata:
@@ -741,8 +740,6 @@ spec:
   parameters:
     labels: ["hr"]
 ```
-
-
 
 ### SECURITY CONTEXT
 
@@ -777,6 +774,7 @@ spec:
     securityContext:
       allowPrivilegeEscalation: false
 ```
+
 </details>
 
 <details><summary>Manage Kubernetes secrets</summary>
@@ -887,7 +885,7 @@ curl https://meow.com/ --cert client.crt --key client.key -k
 
 <https://kubernetes.io/docs/concepts/workloads/pods/ephemeral-containers/>
 
-```
+```bash
     gcr.io/distroless/static-debian10
     gcr.io/distroless/base-debian10
     gcr.io/distroless/java-debian10
@@ -928,7 +926,7 @@ curl https://meow.com/ --cert client.crt --key client.key -k
 
 <https://kube-score.com/>
 
-```
+```bash
 kubectl api-resources --verbs=list --namespaced -o name \
   | xargs -n1 -I{} bash -c "kubectl get {} --all-namespaces -oyaml && echo ---" \
   | kube-score score -
@@ -983,7 +981,8 @@ klar tvdvoorde/api1
 ```
 
 config.yml
-```
+
+```yaml
 clair:
  port: 6060
  healthPort: 6061
@@ -1092,9 +1091,9 @@ spec:
 
 Set `--audit-policy-file` on api server
 
-```
+```bash
 --audit-policy-file string
-	Path to the file that defines the audit policy configuration.
+Path to the file that defines the audit policy configuration.
 ```
 
 Example of audit-policy-file: <https://kubernetes.io/docs/tasks/debug-application-cluster/audit/>
@@ -1109,9 +1108,9 @@ Example of audit-policy-file: <https://kubernetes.io/docs/tasks/debug-applicatio
 
 ## Preparations
 
-Build a v1.19 'kubeadm' cluster on Ubuntu 18 with a dedicated master and worker node 
+Build a v1.19 'kubeadm' cluster on Ubuntu 18 with a dedicated master and worker node
 
-## Command snippers and reference 
+## Command snippers and reference
 
 kubectl is based on v1.19
 
@@ -1122,7 +1121,6 @@ Use `kubectl run -o yaml --dry-run` to create a pod.yaml
 Use `kubectl create deployment -o yaml --dry-run` to create a deployment.yaml
 
 Merge them together in an editor - be carefull of indentation
-
 
 ```bash
 kubectl explain  <type>.<fieldName>[.<fieldName>]
@@ -1228,15 +1226,13 @@ users: `/etc/passwd/` ( `<username>:<password>:<UID>:<GID>` )
 
 accessing cluster
 
-```
+```bash
 kubectl config view -o jsonpath='{"Cluster name\tServer\n"}{range .clusters[*]}{.name}{"\t"}{.cluster.server}{"\n"}{end}'
 export CLUSTER_NAME="aks002"
 APISERVER=$(kubectl config view -o jsonpath="{.clusters[?(@.name==\"$CLUSTER_NAME\")].cluster.server}")
-TOKEN=$(kubectl get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.token}"|base64 --decode) 
+TOKEN=$(kubectl get secrets -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='default')].data.token}"|base64 --decode)
 
 curl -X GET $APISERVER/api --header "Authorization: Bearer $TOKEN" --insecure
-
-
 
 kubectl run nginx --image=nginx --restart=Never
 
@@ -1247,6 +1243,105 @@ kubectl exec nginx -it /bin/sh
 
 
 
+```
+
+## Security related KTHW settings
+
+### ETCD
+
+```bash
+ExecStart=/usr/local/bin/etcd \\
+  --name ${ETCD_NAME} \\
+  --cert-file=/etc/etcd/kubernetes.pem \\
+  --key-file=/etc/etcd/kubernetes-key.pem \\
+  --peer-cert-file=/etc/etcd/kubernetes.pem \\
+  --peer-key-file=/etc/etcd/kubernetes-key.pem \\
+  --trusted-ca-file=/etc/etcd/ca.pem \\
+  --peer-trusted-ca-file=/etc/etcd/ca.pem \\
+  --peer-client-cert-auth \\
+  --client-cert-auth \\
+  --initial-advertise-peer-urls https://${INTERNAL_IP}:2380 \\
+  --listen-peer-urls https://${INTERNAL_IP}:2380 \\
+  --listen-client-urls https://${INTERNAL_IP}:2379,https://127.0.0.1:2379 \\
+  --advertise-client-urls https://${INTERNAL_IP}:2379 \\
+  --initial-cluster-token etcd-cluster-0 \\
+  --initial-cluster control0=https://10.240.0.10:2380,control1=https://10.240.0.11:2380,control2=https://10.240.0.12:2380 \\
+  --initial-cluster-state new \\
+  --data-dir=/var/lib/etcd
+```
+
+### KUBE-APISERVER
+
+```bash
+  --audit-log-path=/var/log/audit.log \\
+  --authorization-mode=Node,RBAC \\
+  --enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota   --etcd-cafile=/var/lib/kubernetes/ca.pem \\
+  --etcd-certfile=/var/lib/kubernetes/kubernetes.pem \\
+  --etcd-keyfile=/var/lib/kubernetes/kubernetes-key.pem \\
+  --etcd-servers=https://10.240.0.10:2379,https://10.240.0.11:2379,https://10.240.0.12:2379 \\
+  --event-ttl=1h \\
+  --experimental-encryption-provider-config=/var/lib/kubernetes/encryption-config.yaml \\
+  --kubelet-certificate-authority=/var/lib/kubernetes/ca.pem \\
+  --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \\
+  --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \\
+  --kubelet-https=true \\
+  --runtime-config=api/all \\
+  --service-account-key-file=/var/lib/kubernetes/service-account.pem \\
+  --service-cluster-ip-range=10.32.0.0/24 \\
+  --service-node-port-range=30000-32767 \\
+  --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \\
+  --tls-private-key-file=/var/lib/kubernetes/kubernetes-key.pem \\
+
+```
+
+### KUBE-CONTROLLER-MANAGER
+
+```bash
+ExecStart=/usr/local/bin/kube-controller-manager \\
+  --address=0.0.0.0 \\
+  --cluster-cidr=10.200.0.0/16 \\
+  --cluster-name=kubernetes \\
+  --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \\
+  --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \\
+  --kubeconfig=/var/lib/kubernetes/kube-controller-manager.kubeconfig \\
+  --leader-elect=true \\
+  --root-ca-file=/var/lib/kubernetes/ca.pem \\
+  --service-account-private-key-file=/var/lib/kubernetes/service-account-key.pem \\
+  --service-cluster-ip-range=10.32.0.0/24 \\
+  --use-service-account-credentials=true \\
+  --v=2
+```
+
+### KUBE-SCHEDULER
+
+```bash
+ExecStart=/usr/local/bin/kube-scheduler \\
+  --kubeconfig=/var/lib/kubernetes/kube-scheduler.kubeconfig \\
+  --address=127.0.0.1 \\
+  --leader-elect=true \\
+```
+
+### KUBELET
+
+```bash
+ExecStart=/usr/local/bin/kubelet \\
+  --config=/var/lib/kubelet/kubelet-config.yaml \\
+  --image-pull-progress-deadline=2m \\
+  --kubeconfig=/var/lib/kubelet/kubeconfig \\
+  --network-plugin=cni \\
+  --register-node=true \\
+  --tls-cert-file=/var/lib/kubelet/${HOSTNAME}.pem \\
+  --tls-private-key-file=/var/lib/kubelet/${HOSTNAME}-key.pem \\
+  --v=2
+```
+
+### KUBEPROXY
+
+```bash
+ExecStart=/usr/local/bin/kube-proxy \\
+  --config=/var/lib/kube-proxy/kube-proxy-config.yaml
+Restart=on-failure
+RestartSec=5
 ```
 
 ## Other usefull sites
@@ -1294,5 +1389,4 @@ URLs allowed in browser (only one tab)
   - For Windows: Ctrl+Insert to copy and Shift+Insert to paste.
 - In addition, you might find it helpful to use the Notepad (see top menu under 'Exam Controls') to manipulate text before pasting to the command line.
 - Installation of services and applications included in this exam may require modification of system security policies to successfully complete.
-- Only a single terminal console is available during the exam. Terminal multiplexers such as GNU Screen and tmux can be used to create virtual consoles.
-
+- Only a single terminal console is available during the exam. Terminal multiplexers such as GNU Screen and tmux can be used to create virtual consoles
