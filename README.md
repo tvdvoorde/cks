@@ -133,6 +133,14 @@ CIS Kubernetes Benchmark v1.6.0
 
 <https://github.com/aquasecurity/kube-bench#running-kube-bench>
 
+```bash
+git clone https://github.com/aquasecurity/kube-bench.git
+kubectl apply -f job.yaml
+kubectl get pod
+kubectl logs kube-bench-vpqbg
+```
+
+
 <https://cloud.google.com/kubernetes-engine/docs/concepts/cis-benchmarks#default-values>
 
 </details>
@@ -924,6 +932,19 @@ curl https://meow.com/ --cert client.crt --key client.key -k
 
 <https://github.com/quay/clair>
 
+clair used postgress db
+clair uses config.yaml, create as secret, mount as file
+
+```bash
+clairctl report --host http://myhost IMAGEN_NAME
+cves=$(cat report | grep " found " | wc -l)
+if [$cves -gt 0]
+then
+  cat report
+  exit 1
+fi
+```
+
 </details>
 
 <details><summary>Scan images for known vulnerabilities (*)</summary>
@@ -1129,6 +1150,7 @@ iptables -t nat -L KUBE-SERVICES
 `sudo cmd` execute command with sudo priv
 
 ```bash
+chmod +x <file>
 chmod <owner><group><other> <file>
 chown <owner>[:<group>] <file>
 ```
