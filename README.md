@@ -1366,6 +1366,12 @@ RestartSec=5
 
 <https://ravikirans.com/cks-kubernetes-security-exam-study-guide/>
 
+<https://deploy.live/blog/cks-certified-kubernetes-security-specialist-exam-preparation-guide/>
+
+<https://github.com/vedmichv/CKS-Certified-Kubernetes-Security-Specialist>
+
+<https://awesomeopensource.com/project/walidshaari/Certified-Kubernetes-Security-Specialist>
+
 ## Exam details
 
 URLs allowed in browser (only one tab)
