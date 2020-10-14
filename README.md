@@ -397,6 +397,8 @@ mv ~/.kube/config ~/.kube/config.org
 
 kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt --server=https://10.0.0.4:6443
 
+kubectl get pods --certificate-authority=/etc/kubernetes/pki/ca.crt --client-key=ted.key --client-certificate=ted.crt https://aks002-rg002-5053b0-483fa38b.hcp.westeurope.azmk8s.io:443
+
 kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods --kubeconfig=/root/.kube/config.org
 kubectl create rolebinding podr-view --role=pod-reader --user=ted  --kubeconfig=/root/.kube/config.org
 
@@ -1192,6 +1194,14 @@ docker stat / inspect
 kubectl top
 
 iptables -t nat -L KUBE-SERVICES
+```
+
+### VIM settings
+
+overwrite vimrc to defaults
+
+```bash
+echo #>~/.vimrc
 ```
 
 ### Linux security
