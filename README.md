@@ -1106,6 +1106,8 @@ Example of audit-policy-file: <https://kubernetes.io/docs/tasks/debug-applicatio
 
 <https://docs.sysdig.com/en/kubernetes-audit-logging.html>
 
+<https://sysdig.com/blog/k3s-sysdig-falco/>
+
 </details>
 
 ## Preparations
@@ -1381,6 +1383,7 @@ RestartSec=5
 <https://github.com/vedmichv/CKS-Certified-Kubernetes-Security-Specialist>
 
 <https://awesomeopensource.com/project/walidshaari/Certified-Kubernetes-Security-Specialist>
+
 
 ## Exam details
 
